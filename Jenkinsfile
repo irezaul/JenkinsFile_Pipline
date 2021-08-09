@@ -12,44 +12,33 @@ pipeline {
     stages {
         stage('Golang Environment Check') {
             steps {
-                //echo 'Hello World';
-                //sh "ls -la";
-                //sh "go version";
-                //sh label: 'golang_version', returnStatus: true, script: 'go version'
-                //tool name: 'golang-1.15', type: 'go'
-                //def root = tool type: 'go', name: 'Go 1.15'
-                //tool name: 'golang-1.15', type: 'go'
-                
-                /*
-                withEnv(["GOROOT=${root}", "PATH+GO=${root}/bin"]) {
-                  sh 'go version'
-                }
-                */
                 sh 'go version';
                 sh "echo ${GO111MODULE}";
             
             }
             
-
-            
+        }
+         stage('SourceCode_Git') {
+            steps {
+                 git 'https://github.com/irezaul/testweb1.git'
+            }
         }
          stage('Build') {
             steps {
-                echo 'Building....'
-            }
-        }
-         stage('Deploy') {
-            steps {
-                echo 'Deploying....'
+                sh 'go build'
             }
         }
         
-         stage('Test') {
+         stage('Execute_permission') {
             steps {
-                echo 'Testing....'
+                sh '''chmod +x ./GoWebAppPipline'''
             }
         }
-        
+        stage('Service_done') {
+            steps {
+                //sh './GoWebAppPipline'
+            }
+        }
          stage('Release') {
             steps {
                 echo 'Reeasing....'
@@ -57,7 +46,7 @@ pipeline {
             post {
                
                 always {
-                    //emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+                    
                     mail to: "mtmartadd@gmail.com", subject:"${currentBuild.currentResult}: ${currentBuild.fullDisplayName}", body: "Test passed."
                 }
             }
